@@ -3,6 +3,7 @@ writer = open('apartmentInfo.csv','w+')
 
 s = set()
 for r in file:
+	print (r)
 	if not r: continue
 	r = r.split(' --> ')
 	if r[0] == 'Name': writer.write(r[0] + '=' + r[1] + '=' + r[2] + '=' + r[3])
