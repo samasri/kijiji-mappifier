@@ -16,7 +16,7 @@ def getAdAddress(link):
 		return ''
 	return list(location[0].children)[1].get_text().strip()
 
-def getAds(url, db):
+def getAds(url, processedLinks, db):
 	fp = urllib.request.urlopen(url)
 	mybytes = fp.read()
 	soup = BeautifulSoup(mybytes, 'html.parser')
@@ -31,6 +31,11 @@ def getAds(url, db):
 			continue
 		title = titles[0].find_all('a')[0].get_text().strip()
 		link = 'https://www.kijiji.ca' + titles[1]['href']
+		
+		# Skip already processed entries
+		if link in processedLinks:
+			print('Hit already saved ad!')
+			continue
 		
 		# Get price
 		prices = ad.find_all('div',class_='price')
@@ -54,10 +59,17 @@ def getAds(url, db):
 		print ('One ad completed!')
 	return ignored
 
+# Get already processed ads
+db = open('apartmentInfo')
+processedLinks = set()
+for ad in db:
+	if not ad: continue
+	ad = ad.split(' --> ')
+	processedLinks.add(ad[2])
 
+# Process new ads
 db = open('apartmentInfo','a')
 
-for page in range(11):
-	if page == 0 or page == 1: continue
+for page in range(25):
 	print("Checking page: " + str(page))
-	print(getAds('https://www.kijiji.ca/b-house-rental/gta-greater-toronto-area/page-' + str(page) + '/c43l1700272?ad=offering', db))
+	print(getAds('https://www.kijiji.ca/b-house-rental/gta-greater-toronto-area/page-' + str(page) + '/c43l1700272?ad=offering', processedLinks, db))
