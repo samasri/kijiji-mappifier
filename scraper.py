@@ -70,6 +70,8 @@ for ad in db:
 # Process new ads
 db = open('apartmentInfo','a')
 
-for page in range(25):
+var nbOfPages = 25
+
+for page in range(nbOfPages):
 	print("Checking page: " + str(page))
 	print(getAds('https://www.kijiji.ca/b-house-rental/gta-greater-toronto-area/page-' + str(page) + '/c43l1700272?ad=offering', processedLinks, db))
