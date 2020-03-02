@@ -1,1 +1,6 @@
 html/token.js
+apartmentInfo
+addressCache
+MyLib/__pycache__/*
+MyLib/locationiq_token.py
+html/data.js
