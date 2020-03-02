@@ -1,59 +1,13 @@
 import os, sys, requests
 from time import sleep
+from MyLib.GeoLocation import getToken, getAppartmentInfo, processCache
 
-class Ad:
-	def __init__(self, title, price, link, address):
-		self.title = title.replace('"','')
-		self.price = price
-		self.link = link
-		self.address = address
-		self.lat = "none"
-		self.lon = "none"
-	
-	def __str__(self):
-		# assert self.lat != "none" and self.lon != "none"
-		jsonStr = '''{
-  "title": "%s",
-  "price": "%s",
-  "link": "%s",
-  "address": "%s",
-  "lat": "%s",
-  "lon": "%s"
-}''' % (self.title,self.price,self.link,self.address,self.lat,self.lon)
-		return jsonStr
+ads = getAppartmentInfo('apartmentInfo')
+cache = processCache('addressCache')
 
-file = open('apartmentInfo')
-
-MAX = 2000
-MIN = 0
-
-# Collect data from file
-ads = []
-for r in file:
-	if not r: continue
-	r = r.split(' --> ')
-	title = r[0].strip()
-	price = r[1].strip()[1:].replace(',','')
-	link = r[2].strip()
-	address = r[3].strip()
-	ads.append(Ad(title,price,link,address))
-	# Filter by price
-	price = int(price[:-3].replace(',',''))
-	if price < MIN or price > MAX: continue
-
-key = '859284e3122a88'
+key = getToken()
 query = 'Denny%20St,%20Ajax,%20ON%20L1Z0C6,%20Canada'
-baseURL = "https://us1.locationiq.com/v1/search.php?key=%s" % key #&q=%s&format=json" % (key,query)
-# r = request
-# t("Lon: " + str(data[0]["lon"]))
-
-cache = {}
-cacheFile = open('addressCache')
-for r in cacheFile:
-	r = r.strip()
-	if not r: continue
-	r = r.split(' --> ')
-	cache[r[0]] = r[1].split(',')
+baseURL = "https://us1.locationiq.com/v1/search.php?key=%s" % key 
 
 cacheFile = open('addressCache','a+')
 ignoredAds = []
@@ -62,10 +16,13 @@ adCounter = 0
 for ad in ads:
 	adCounter += 1
 	if ad.address in cache:
-		# print("Cache hit!",file=sys.stderr)
-		ad.lat = cache[ad.address][0]
-		ad.lon = cache[ad.address][1]
-		toPrint += str(ad) + ',\n'
+		if  cache[ad.address][0] == "none" or cache[ad.address][1] == "none":
+			ignoredAds.append(ad)
+			continue
+		else:
+			ad.lat = cache[ad.address][0]
+			ad.lon = cache[ad.address][1]
+			toPrint += str(ad) + ',\n'
 	else:
 		sleep(1)
 		query = ad.address
@@ -74,24 +31,23 @@ for ad in ads:
 		try:
 			data = r.json()
 		except:
-			print("Error processing coordinates via geocoding",file=sys.stderr)
+			print("Failed to process output of LocationIQ to a JSON file",file=sys.stderr)
 			ignoredAds.append(ad)
 			continue
 		if "error" in data:
-			print("Error retreiving coordinates via geocoding",file=sys.stderr)
+			print("Geocoding API failed to process the following address: " + ad.address,file=sys.stderr)
 			ignoredAds.append(ad)
-			continue
 		else:
-			if len(data) > 1: print("Error: geocoding resulted in more than one result",file=sys.stderr)
+			if len(data) > 1: print("Geocoding resulted in more than one result, ignoring all except the first one",file=sys.stderr)
 			ad.lat = data[0]["lat"]
 			ad.lon = data[0]["lon"]
 			toPrint += str(ad) + ',\n'
 		cacheFile.write('%s --> %s,%s\n' % (ad.address, ad.lat, ad.lon))
 		cache[ad.address] = [ad.lat,ad.lon]
 		cacheFile.flush()
-	# if(adCounter % 10 == 0): print("Processed so far: %d/%d" % (adCounter,len(ads)),file=sys.stderr)
+	if(adCounter % 10 == 0): print("Processed so far: %d/%d" % (adCounter,len(ads)),file=sys.stderr)
 toPrint = toPrint[:-2] + "\n]"
 print(toPrint)
 
-print("Ignored Ads:")
-for ad in ignoredAds: print("* " + ad.link)
+# print("Ignored Ads:")
+# for ad in ignoredAds: print("* " + ad.link)
