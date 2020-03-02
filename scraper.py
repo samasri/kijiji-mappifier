@@ -1,22 +1,6 @@
 import urllib.request
 from bs4 import BeautifulSoup
-import re
-
-def getAdAddress(link):
-	try:
-		fp = urllib.request.urlopen(link)
-	except:
-		print ("Link is not valid, ignoring: " + link)
-		return ""
-	mybytes = fp.read()
-	soup = BeautifulSoup(mybytes, 'html.parser')
-	
-	location = soup.find_all(class_=re.compile('locationContainer-*'))
-	if len(location) != 1:
-		print ("Cannot find appropriate location: " + str(len(location)))
-		# print('\tLink: ' + link)
-		return ''
-	return list(location[0].children)[1].get_text().strip()
+from MyLib.Scraping import getAdAddress, getPriceOf
 
 def getAds(url, processedLinks, db):
 	fp = urllib.request.urlopen(url)
@@ -25,37 +9,26 @@ def getAds(url, processedLinks, db):
 
 	ignored = 0
 	ads = soup.find_all(class_='search-item')
-	counter = 0
+	adCounter = 0
 	for ad in ads:
 		# Get title and link
 		titles = ad.find_all(class_='title')
 		if len(titles) != 2:
 			ignored += 1
-			print ('error, there are no two tags with class "title" for this ad')
+			print ('  Error, there are no two tags with class "title" for this ad')
 			continue
 		title = titles[0].find_all('a')[0].get_text().strip()
 		link = 'https://www.kijiji.ca' + titles[1]['href']
 		
 		# Skip already processed entries
 		if link in processedLinks:
-			print('Hit already saved ad!')
+			adCounter += 1
+			print('  Hit already saved ad: %d/%d'% (adCounter, len(ads)))
 			continue
 		
 		# Get price
-		prices = ad.find_all('div',class_='price')
-		if len(prices) != 1: 
-			ignored += 1
-			print ('error, more than one price for ad: ' + link)
-			continue
-		else: price = prices[0].get_text().strip()
-		if price == 'Please Contact':
-			print ('price not found, ignoring this entry')
-			ignored += 1
-			continue
-		try: # Remove prices that are not valid numbers
-			priceFloat = float(price.replace('$','').replace(',',''))
-		except:
-			print ('price not in right format, ignoring this entry')
+		price = getPriceOf(ad)
+		if price == -1:
 			ignored += 1
 			continue
 		
@@ -68,8 +41,9 @@ def getAds(url, processedLinks, db):
 		toWrite = title + " --> " + price + " --> " + link + ' --> ' + address + '\n'
 		toWrite = toWrite.encode('ascii', 'ignore').decode('ascii') # ignore non-ascii encoded characters
 		db.write(toWrite)
-		counter += 1
-		print ('Ad completed: ' + str(counter) + '/' + str(len(ads)))
+		processedLinks.add(link)
+		adCounter += 1
+		print ('  Ad completed: %d/%d' % (adCounter, len(ads)))
 	db.flush()
 	return ignored
 
@@ -80,14 +54,14 @@ for ad in db:
 	if not ad: continue
 	ad = ad.split(' --> ')
 	processedLinks.add(ad[2])
-db = open('apartmentInfo','a+')
 
 # Process new ads
-db = open('apartmentInfo','a')
+db = open('apartmentInfo','a+')
 
-baseLink = 'https://www.kijiji.ca/b-house-rental/markham-york-region'
+baseLink = 'https://www.kijiji.ca/b-for-rent/gta-greater-toronto-area'
 nbOfPages = 40
 
 for page in range(nbOfPages):
-	print("Checking page: " + str(page) + "/" + str(nbOfPages))
-	print(getAds(baseLink + '/page-' + str(page) + '/c43l1700272?ad=offering', processedLinks, db))
+	print("Checking page: " + str(page + 1) + "/" + str(nbOfPages))
+	ignoredAds = getAds(baseLink + '/page-' + str(page) + '/c30349001l1700272?ad=offering', processedLinks, db)
+	print(str(ignoredAds) + " ignored ads")
