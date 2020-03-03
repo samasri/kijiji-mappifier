@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import urllib.request
 from bs4 import BeautifulSoup
 from MyLib.Scraping import getAdAddress, getPriceOf
@@ -59,7 +61,7 @@ for ad in db:
 db = open('apartmentInfo','a+')
 
 baseLink = 'https://www.kijiji.ca/b-for-rent/gta-greater-toronto-area'
-nbOfPages = 40
+nbOfPages = 100
 
 for page in range(nbOfPages):
 	print("Checking page: " + str(page + 1) + "/" + str(nbOfPages))

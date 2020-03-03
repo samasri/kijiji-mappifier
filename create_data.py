@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os, sys, requests
 from time import sleep
 from MyLib.GeoLocation import getToken, getAppartmentInfo, processCache
