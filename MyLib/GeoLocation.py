@@ -1,9 +1,11 @@
 from MyLib.locationiq_token import token
+import sys, requests
+baseURL = "https://us1.locationiq.com/v1/search.php?key=%s" % token # For API calls
 
 class Ad:
 	def __init__(self, title, price, link, address):
 		self.title = title.replace('"','')
-		self.price = price
+		self.price = float(price)
 		self.link = link
 		self.address = address
 		self.lat = "none"
@@ -13,7 +15,7 @@ class Ad:
 		# assert self.lat != "none" and self.lon != "none"
 		jsonStr = '''{
   "title": "%s",
-  "price": "%s",
+  "price": %f,
   "link": "%s",
   "address": "%s",
   "lat": "%s",
@@ -23,9 +25,6 @@ class Ad:
 
 def getAppartmentInfo(filePath):
     inputFile = open(filePath)
-
-    MAX = 2000
-    MIN = 0
 
     # Collect data from file
     ads = []
@@ -39,7 +38,6 @@ def getAppartmentInfo(filePath):
         ads.append(Ad(title,price,link,address))
         # Filter by price
         price = int(price[:-3].replace(',',''))
-        if price < MIN or price > MAX: continue
     return ads
 
 def processCache(filePath):
@@ -51,6 +49,15 @@ def processCache(filePath):
         r = r.split(' --> ')
         cache[r[0]] = r[1].split(',')
     return cache
+
+def getLocation(query):
+    url = baseURL + "&q=%s&format=json" % (query)
+    r = requests.get(url)
+    try: data = r.json()
+    except: return -1
+    if "error" in data: return -2
+    if len(data) > 1: print("  Geocoding resulted in more than one result, ignoring all except the first one",file=sys.stderr)
+    return data[0]["lat"],data[0]["lon"]
 
 def getToken():
     return token

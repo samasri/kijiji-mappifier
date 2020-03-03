@@ -1,1 +1,1 @@
-token = 'INSERT TOKEN HERE'
+token = '859284e3122a88'

@@ -8,8 +8,15 @@ def __getAdAddress(link):
 	except:
 		print ("  Link is not valid, ignoring: " + link)
 		return ""
+	# An error in the connection can cause this, see this bug for more info: https://bugs.python.org/issue26499
+	# Hence, try 3 times before ignoring an ad
 	try: mybytes = fp.read()
-	except: mybytes = fp.read() # Try again, see this bug for more info: https://bugs.python.org/issue26499
+	except:
+		try: mybytes = fp.read() 
+		except:
+			try: mybytes = fp.read()
+			except:
+				return ''
 	soup = BeautifulSoup(mybytes, 'html.parser')
 	
 	location = soup.find_all(class_=re.compile('locationContainer-*'))

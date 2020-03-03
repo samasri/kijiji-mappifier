@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
 
-import os, sys, requests
+import os, sys
 from time import sleep
-from MyLib.GeoLocation import getToken, getAppartmentInfo, processCache
+from MyLib.GeoLocation import getAppartmentInfo, processCache, getLocation
 
 ads = getAppartmentInfo('apartmentInfo')
 cache = processCache('addressCache')
-
-key = getToken()
-query = 'Denny%20St,%20Ajax,%20ON%20L1Z0C6,%20Canada'
-baseURL = "https://us1.locationiq.com/v1/search.php?key=%s" % key 
 
 cacheFile = open('addressCache','a+')
 ignoredAds = []
@@ -27,23 +23,18 @@ for ad in ads:
 			toPrint += str(ad) + ',\n'
 	else:
 		sleep(1)
-		query = ad.address
-		url = baseURL + "&q=%s&format=json" % (query)
-		r = requests.get(url)
-		try:
-			data = r.json()
-		except:
-			print("Failed to process output of LocationIQ to a JSON file",file=sys.stderr)
+		pair = getLocation(ad.address)
+		if isinstance(pair, int) and pair < 0:
+			if pair == -1:
+				print("  Failed to process output of LocationIQ to a JSON file for address: " + ad.address,file=sys.stderr)
+				continue
+			if pair == -2:
+				print("  Geocoding API failed to process the following address: " + ad.address,file=sys.stderr)
+				pair = None,None
+				# Cache that this is an error
 			ignoredAds.append(ad)
-			continue
-		if "error" in data:
-			print("Geocoding API failed to process the following address: " + ad.address,file=sys.stderr)
-			ignoredAds.append(ad)
-		else:
-			if len(data) > 1: print("Geocoding resulted in more than one result, ignoring all except the first one",file=sys.stderr)
-			ad.lat = data[0]["lat"]
-			ad.lon = data[0]["lon"]
-			toPrint += str(ad) + ',\n'
+		ad.lat,ad.lon = pair[0],pair[1]
+		toPrint += str(ad) + ',\n'
 		cacheFile.write('%s --> %s,%s\n' % (ad.address, ad.lat, ad.lon))
 		cache[ad.address] = [ad.lat,ad.lon]
 		cacheFile.flush()
