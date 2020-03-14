@@ -14,7 +14,7 @@ adCounter = 0
 for ad in ads:
 	adCounter += 1
 	if ad.address in cache:
-		if  cache[ad.address][0] == "none" or cache[ad.address][1] == "none":
+		if  cache[ad.address][0].lower() == "none" or cache[ad.address][1].lower() == "none":
 			ignoredAds.append(ad)
 			continue
 		else:
@@ -32,6 +32,10 @@ for ad in ads:
 				print("  Geocoding API failed to process the following address: " + ad.address,file=sys.stderr)
 				pair = None,None
 				# Cache that this is an error
+				cacheFile.write('%s --> %s,%s\n' % (ad.address, ad.lat, ad.lon))
+				cache[ad.address] = [ad.lat,ad.lon]
+				cacheFile.flush()
+				continue
 			ignoredAds.append(ad)
 		ad.lat,ad.lon = pair[0],pair[1]
 		toPrint += str(ad) + ',\n'

@@ -19,7 +19,8 @@ def getAds(url, processedLinks, db):
 			ignored += 1
 			print ('  Error, there are no two tags with class "title" for this ad')
 			continue
-		title = titles[0].find_all('a')[0].get_text().strip()
+		title = titles[0].find_all('a')[0].get_text().strip().replace('\n',' ').replace('\r',' ')
+		while '  ' in title: title = title.replace('  ',' ')
 		link = 'https://www.kijiji.ca' + titles[1]['href']
 		
 		# Skip already processed entries
