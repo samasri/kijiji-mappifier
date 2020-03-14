@@ -19,12 +19,13 @@ I created this tool when I was looking for a place to rent when I came to Toront
 6. Create the data for the map: `python3.5 create_map.py > html/data.js`
 7. Render _html/result.html_ in a browser to view the results
 
-## Screenshot of the result
+## Screenshots of the result
 
-![screenshot1](https://user-images.githubusercontent.com/12204690/75831760-63387f00-5d82-11ea-8693-81547269e25d.png)
+* ![screenshot1](https://user-images.githubusercontent.com/12204690/75831760-63387f00-5d82-11ea-8693-81547269e25d.png)
 
-![screenshot2](https://user-images.githubusercontent.com/12204690/75831751-5b78da80-5d82-11ea-9a25-e89695df0ac9.png)
+* ![screenshot2](https://user-images.githubusercontent.com/12204690/75831751-5b78da80-5d82-11ea-9a25-e89695df0ac9.png)
 
-![screenshot3](https://user-images.githubusercontent.com/12204690/75831768-6df31400-5d82-11ea-80a1-dd8f3139cfc6.png)
+* ![screenshot3](https://user-images.githubusercontent.com/12204690/75831768-6df31400-5d82-11ea-80a1-dd8f3139cfc6.png)
 
-![screenshot4](https://user-images.githubusercontent.com/12204690/75831783-7c413000-5d82-11ea-9628-08482fe2ee20.png)
+* ![screenshot4](https://user-images.githubusercontent.com/12204690/75831783-7c413000-5d82-11ea-9628-08482fe2ee20.png)
+
