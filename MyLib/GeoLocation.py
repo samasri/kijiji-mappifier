@@ -2,6 +2,8 @@ from MyLib.locationiq_token import token
 import sys, requests
 baseURL = "https://us1.locationiq.com/v1/search.php?key=%s" % token # For API calls
 
+debug = True
+
 class Ad:
 	def __init__(self, title, price, link, address):
 		self.title = title.replace('"','')
@@ -23,6 +25,9 @@ class Ad:
 }''' % (self.title,self.price,self.link,self.address,self.lat,self.lon)
 		return jsonStr
 
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
 def getAppartmentInfo(filePath):
     inputFile = open(filePath)
 
@@ -31,6 +36,9 @@ def getAppartmentInfo(filePath):
     for r in inputFile:
         if not r: continue
         r = r.split(' --> ')
+        if len(r) != 4:
+            eprint("---------- ERROR in: %s" % r)
+            continue
         title = r[0].strip()
         price = r[1].strip()[1:].replace(',','')
         link = r[2].strip()
@@ -56,7 +64,11 @@ def getLocation(query):
     try: data = r.json()
     except: return -1
     if "error" in data: return -2
-    if len(data) > 1: print("  Geocoding resulted in more than one result, ignoring all except the first one",file=sys.stderr)
+    if len(data) > 1:
+        if debug:
+            print("  Geocoding resulted in more than one result, ignoring all except the first one",file=sys.stderr)
+            for d in data:
+                print(" - %s" % d["display_name"],file=sys.stderr)
     return data[0]["lat"],data[0]["lon"]
 
 def getToken():
