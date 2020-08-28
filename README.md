@@ -1,6 +1,6 @@
 # Kijiji Mappifier
 
-I created this tool when I was looking for a place to rent when I came to Toronto. Since Kijiji has no map feature when looking for appartments to rent, this tool scrapes the result pages of Kijiji, finds the price and location of the appartments, and stores them in a CSV database. It then uses [LocationIQ](https://locationiq.com/) API to get the coordinates of each address. Finally, [Leafletjs](https://leafletjs.com/) API is used to display the results on a map.
+I created this tool after I moved to Toronto and was looking for a place to rent. Since Kijiji has no map feature when looking for appartments to rent, this tool scrapes the result pages of Kijiji, finds the price and location of the appartments, and stores them in a CSV database. It then uses [LocationIQ](https://locationiq.com/) API to get the coordinates of each address. Finally, [Leafletjs](https://leafletjs.com/) API is used to display the results on a map.
 
 ## Prerequisits
 
@@ -16,7 +16,7 @@ I created this tool when I was looking for a place to rent when I came to Toront
 3. Set your LocationIQ token in [locationiq_token.py](https://github.com/samasri/KijijiMapDrawer/blob/master/MyLib/locationiq_token.py)
 4. Run the scraper: `python3.5 scraper.py`. A csv result file (_apartmentInfo_) is produced (using `-->` as a delimeter).
 5. Set your Leaflet token in [token.js](https://github.com/samasri/KijijiMapDrawer/blob/master/html/token.js)
-6. Create the data for the map: `python3.5 create_map.py > html/data.js`
+6. Create the data for the map: `python3.5 create_data.py > html/data.js`
 7. Render _html/result.html_ in a browser to view the results
 
 ## Screenshots of the result
@@ -28,4 +28,3 @@ I created this tool when I was looking for a place to rent when I came to Toront
 * ![screenshot3](https://user-images.githubusercontent.com/12204690/75831768-6df31400-5d82-11ea-80a1-dd8f3139cfc6.png)
 
 * ![screenshot4](https://user-images.githubusercontent.com/12204690/75831783-7c413000-5d82-11ea-9628-08482fe2ee20.png)
-
