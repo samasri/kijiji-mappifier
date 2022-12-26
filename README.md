@@ -4,20 +4,15 @@ I created this tool after I moved to Toronto and was looking for a place to rent
 
 ## Prerequisits
 
-* python 3.5
-* BeautifulSoup4
+* `node` and `yarn` installed in the `PATH`
 * [LocationIQ](https://locationiq.com/) token
 * [Leafletjs](https://leafletjs.com/) token
 
 ## How to use
 
-1. Edit the link that is hard coded in [the scraper](https://github.com/samasri/KijijiMapDrawer/blob/master/scraper.py#L88) in order to direct python to the right search pages that should be scraped
-2. Edit the [number of pages](https://github.com/samasri/KijijiMapDrawer/blob/master/scraper.py#L89) to tell python how many pages from that search have to be scraped
-3. Set your LocationIQ token in [locationiq_token.py](https://github.com/samasri/KijijiMapDrawer/blob/master/MyLib/locationiq_token.py)
-4. Run the scraper: `python3.5 scraper.py`. A csv result file (_apartmentInfo_) is produced (using `-->` as a delimeter).
-5. Set your Leaflet token in [token.js](https://github.com/samasri/KijijiMapDrawer/blob/master/html/token.js)
-6. Create the data for the map: `python3.5 create_data.py > html/data.js`
-7. Render _html/result.html_ in a browser to view the results
+1. Export `LOCATION_IQ_TOKEN` to your LocationIQ token and `LEAFLET_TOKEN` to your LeafletJs token.
+2. Run the backend: `cd packages/backend; node index.js`. The backend will generate a _frontend/data.json_ file that contains the data needed to be rendered in the frontend map. It will also create a _frontend/token.js_ that includes the leaflet token, this will be used by the frontend to show a map.
+3. Open _frontend/index.html_ in a browser to view the results
 
 ## Screenshots of the result
 
