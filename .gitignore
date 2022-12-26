@@ -1,5 +1,5 @@
-frontend/token.js
-frontend/data.js
+packages/frontend/token.js
+packages/frontend/data.js
 packages/backend/temp*
 packages/backend/node_modules*
 packages/backend/.env
